@@ -1,17 +1,17 @@
 package com.uas.habittracker.utils
 
-import java.sql.Date
 import java.sql.Timestamp
 import java.text.SimpleDateFormat
-import java.time.DateTimeException
+import java.util.Date
+import java.util.Locale
 
 object Calculations {
 
     fun calculateTimeBetweenDates(startDate: String): String {
         val endDate: String = timeStampToString(System.currentTimeMillis())
         val sdf = SimpleDateFormat("dd/MM/yyyy HH:mm")
-        val date1: Date? = sdf.parse(startDate) as Date? // -> error handler
-        val date2: Date? = sdf.parse(endDate) as Date? // -> error handler
+        val date1: Date? = sdf.parse(startDate)
+        val date2: Date? = sdf.parse(endDate)
 
         var isNegative = false
 
@@ -48,11 +48,13 @@ object Calculations {
     }
 
     private fun timeStampToString(timestamp: Long): String {
-        val stamp = Timestamp(timestamp)
+        /*val stamp = Timestamp(timestamp)
         val sdf = SimpleDateFormat("dd/MM/yyyy HH:mm")
         val date: String = sdf.format((Date(stamp.time)))
 
-        return date.toString()
+        return date.toString()*/
+        val sdf = SimpleDateFormat("dd/MM/yyy HH:mm", Locale.getDefault())
+        return sdf.format(Date(timestamp))
     }
 
     fun cleanDate(_day: Int, _month: Int, _year: Int): String {
@@ -64,7 +66,7 @@ object Calculations {
         }
 
         if (_month < 9) {
-            month = "0{$_month + 1}"
+            month = "0${_month + 1}"
         }
         return "$day/$month/$_year"
     }
