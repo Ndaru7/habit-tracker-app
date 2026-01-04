@@ -56,6 +56,7 @@ class HabitList : Fragment(R.layout.fragment_habit_list) {
         })
 
         //setHasOptionsMenu(true) // -> Deprecated
+        // Menu
         val menuHost: MenuHost = requireActivity()
         menuHost.addMenuProvider(object: MenuProvider {
 

@@ -42,7 +42,6 @@ TimePickerDialog.OnTimeSetListener, DatePickerDialog.OnDateSetListener {
     private lateinit var habitViewModel: HabitViewModel
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        // super.onViewCreated(view, savedInstanceState)
         _binding = FragmentCreateHabitItemBinding.bind(view)
 
         habitViewModel = ViewModelProvider(this).get(HabitViewModel::class.java)
@@ -67,6 +66,8 @@ TimePickerDialog.OnTimeSetListener, DatePickerDialog.OnDateSetListener {
 
             habitViewModel.addHabit(habit)
             Toast.makeText(context, "Habit created successfully!", Toast.LENGTH_SHORT).show()
+
+            findNavController().navigate(R.id.action_createHabitItem_to_habitList)
         } else {
             Toast.makeText(context, "Please fill all field", Toast.LENGTH_SHORT).show()
         }
