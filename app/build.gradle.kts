@@ -64,4 +64,6 @@ dependencies {
     implementation("androidx.room:room-ktx:2.8.4")
     kapt("androidx.room:room-compiler:2.8.4")
 
+    implementation("me.relex:circleindicator:2.1.6")
+
 }
