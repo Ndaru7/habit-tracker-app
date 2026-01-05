@@ -4,11 +4,17 @@ import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.icu.util.Calendar
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
+import android.view.ViewGroup
+import android.widget.Button
 import android.widget.DatePicker
+import android.widget.EditText
+import android.widget.ImageView
+import android.widget.TextView
 import android.widget.TimePicker
 import android.widget.Toast
 import androidx.core.view.MenuHost
@@ -20,14 +26,21 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.uas.habittracker.R
 import com.uas.habittracker.data.models.Habit
-import com.uas.habittracker.databinding.FragmentUpdateHabitItemBinding
 import com.uas.habittracker.ui.viewmodels.HabitViewModel
 import com.uas.habittracker.utils.Calculations
 
-class UpdateHabitItem : Fragment(R.layout.fragment_update_habit_item), TimePickerDialog.OnTimeSetListener, DatePickerDialog.OnDateSetListener {
-    private var _binding: FragmentUpdateHabitItemBinding? = null
-    private val binding get() = _binding!!
-
+class UpdateHabitItem : Fragment(), TimePickerDialog.OnTimeSetListener, DatePickerDialog.OnDateSetListener {
+    private lateinit var view: View
+    private lateinit var btnConfirmUpdate: Button
+    private lateinit var etHabitTitleUpdate: EditText
+    private lateinit var etHabitDescriptionUpdate: EditText
+    private lateinit var ivFastFoodSelectedUpdate: ImageView
+    private lateinit var ivSmokeSelectedUpdate: ImageView
+    private lateinit var ivTeaSelectedUpdate: ImageView
+    private lateinit var btnPickDateUpdate: Button
+    private lateinit var btnPickTimeUpdate: Button
+    private lateinit var tvDateSelectedUpdate: TextView
+    private lateinit var tvTimeSelectedUpdate: TextView
     private var title = ""
     private var description = ""
     private var drawableSelected = 0
@@ -45,8 +58,28 @@ class UpdateHabitItem : Fragment(R.layout.fragment_update_habit_item), TimePicke
     private lateinit var habitViewModel: HabitViewModel
     private val args by navArgs<UpdateHabitItemArgs>()
 
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        view = inflater.inflate(R.layout.fragment_update_habit_item, null)
+        return view
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        _binding = FragmentUpdateHabitItemBinding.bind(view)
+        habitViewModel = ViewModelProvider(this).get(HabitViewModel::class.java)
+
+        btnConfirmUpdate = view.findViewById(R.id.btn_confirm_update)
+        etHabitTitleUpdate = view.findViewById(R.id.et_habitTitle_update)
+        etHabitDescriptionUpdate = view.findViewById(R.id.et_habitDescription_update)
+        ivFastFoodSelectedUpdate = view.findViewById(R.id.iv_fastFoodSelected_update)
+        ivSmokeSelectedUpdate = view.findViewById(R.id.iv_smokingSelected_update)
+        ivTeaSelectedUpdate = view.findViewById(R.id.iv_teaSelected_update)
+        btnPickDateUpdate = view.findViewById(R.id.btn_pickDate_update)
+        btnPickTimeUpdate = view.findViewById(R.id.btn_pickTime_update)
+        tvDateSelectedUpdate = view.findViewById(R.id.tv_dateSelected_update)
+        tvTimeSelectedUpdate = view.findViewById(R.id.tv_timeSelected_update)
 
         // Option Menu
         val menuHost: MenuHost = requireActivity()
@@ -67,23 +100,21 @@ class UpdateHabitItem : Fragment(R.layout.fragment_update_habit_item), TimePicke
             }
         }, viewLifecycleOwner, Lifecycle.State.RESUMED)
 
-        habitViewModel = ViewModelProvider(this).get(HabitViewModel::class.java)
-
-        binding.etHabitTitleUpdate.setText(args.selectedHabit.habitTitle)
-        binding.etHabitDescriptionUpdate.setText(args.selectedHabit.habitDescription)
+        etHabitTitleUpdate.setText(args.selectedHabit.habitTitle)
+        etHabitDescriptionUpdate.setText(args.selectedHabit.habitDescription)
 
         drawableSelected()
         pickDateAndTime()
 
-        binding.btnConfirmUpdate.setOnClickListener {
+        btnConfirmUpdate.setOnClickListener {
             updateHabit()
         }
 
     }
 
     private fun updateHabit() {
-        title = binding.etHabitTitleUpdate.text.toString()
-        description = binding.etHabitDescriptionUpdate.text.toString()
+        title = etHabitTitleUpdate.text.toString()
+        description = etHabitDescriptionUpdate.text.toString()
         timeStamp = "$cleanDate $cleanTime"
 
         if (!(title.isEmpty() || description.isEmpty() || timeStamp.isEmpty() || drawableSelected == 0)) {
@@ -98,38 +129,38 @@ class UpdateHabitItem : Fragment(R.layout.fragment_update_habit_item), TimePicke
     }
 
     private fun drawableSelected() {
-        binding.ivFastFoodSelectedUpdate.setOnClickListener {
-            binding.ivFastFoodSelectedUpdate.isSelected = !binding.ivFastFoodSelectedUpdate.isSelected
+        ivFastFoodSelectedUpdate.setOnClickListener {
+            ivFastFoodSelectedUpdate.isSelected = !ivFastFoodSelectedUpdate.isSelected
             drawableSelected = R.drawable.ic_fastfood_filled
 
-            binding.ivSmokingSelectedUpdate.isSelected = false
-            binding.ivTeaSelectedUpdate.isSelected = false
+            ivSmokeSelectedUpdate.isSelected = false
+            ivTeaSelectedUpdate.isSelected = false
         }
 
-        binding.ivSmokingSelectedUpdate.setOnClickListener {
-            binding.ivSmokingSelectedUpdate.isSelected = !binding.ivSmokingSelectedUpdate.isSelected
+        ivSmokeSelectedUpdate.setOnClickListener {
+            ivSmokeSelectedUpdate.isSelected = !ivSmokeSelectedUpdate.isSelected
             drawableSelected = R.drawable.ic_smoke_filled
 
-            binding.ivTeaSelectedUpdate.isSelected = false
-            binding.ivFastFoodSelectedUpdate.isSelected = false
+            ivTeaSelectedUpdate.isSelected = false
+            ivFastFoodSelectedUpdate.isSelected = false
         }
 
-        binding.ivTeaSelectedUpdate.setOnClickListener {
-            binding.ivTeaSelectedUpdate.isSelected = !binding.ivTeaSelectedUpdate.isSelected
+        ivTeaSelectedUpdate.setOnClickListener {
+            ivTeaSelectedUpdate.isSelected = !ivTeaSelectedUpdate.isSelected
             drawableSelected = R.drawable.ic_tea_filled
 
-            binding.ivSmokingSelectedUpdate.isSelected = false
-            binding.ivFastFoodSelectedUpdate.isSelected = false
+            ivSmokeSelectedUpdate.isSelected = false
+            ivFastFoodSelectedUpdate.isSelected = false
         }
     }
 
     private fun pickDateAndTime() {
-        binding.btnPickDateUpdate.setOnClickListener {
+        btnPickDateUpdate.setOnClickListener {
             getDateCalendar()
             DatePickerDialog(requireContext(), this, year, month, day).show()
         }
 
-        binding.btnPickTimeUpdate.setOnClickListener {
+        btnPickTimeUpdate.setOnClickListener {
             getTimeCalendar()
             TimePickerDialog(context, this, hour, minute, true).show()
         }
@@ -141,7 +172,7 @@ class UpdateHabitItem : Fragment(R.layout.fragment_update_habit_item), TimePicke
         minuteX: Int
     ) {
         cleanTime = Calculations.cleanTime(hourOfDay, minuteX)
-        binding.tvTimeSelectedUpdate.text = "Time: $cleanTime"
+        tvTimeSelectedUpdate.text = "Time: $cleanTime"
     }
 
     override fun onDateSet(
@@ -151,7 +182,7 @@ class UpdateHabitItem : Fragment(R.layout.fragment_update_habit_item), TimePicke
         dayX: Int
     ) {
         cleanDate = Calculations.cleanDate(dayX, monthX, yearX)
-        binding.tvDateSelectedUpdate.text = "Date: $cleanDate"
+        tvDateSelectedUpdate.text = "Date: $cleanDate"
     }
 
     private fun getTimeCalendar() {

@@ -4,8 +4,14 @@ import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.icu.util.Calendar
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
+import android.widget.Button
 import android.widget.DatePicker
+import android.widget.EditText
+import android.widget.ImageView
+import android.widget.TextView
 import android.widget.TimePicker
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -13,18 +19,23 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.uas.habittracker.R
 import com.uas.habittracker.data.models.Habit
-import com.uas.habittracker.databinding.FragmentCreateHabitItemBinding
-import com.uas.habittracker.databinding.FragmentHabitListBinding
 import com.uas.habittracker.ui.viewmodels.HabitViewModel
 import com.uas.habittracker.utils.Calculations
 
 
-class CreateHabitItem : Fragment(R.layout.fragment_create_habit_item),
+class CreateHabitItem : Fragment(),
 TimePickerDialog.OnTimeSetListener, DatePickerDialog.OnDateSetListener {
-
-    private var _binding: FragmentCreateHabitItemBinding? = null
-    private val binding get() = _binding!!
-
+    private lateinit var view: View
+    private lateinit var btnConfirm: Button
+    private lateinit var etHabitTitle: EditText
+    private lateinit var etHabitDescription: EditText
+    private lateinit var ivFastFoodSelected: ImageView
+    private lateinit var ivSmokeSelected: ImageView
+    private lateinit var ivTeaSelected: ImageView
+    private lateinit var btnPickDate: Button
+    private lateinit var btnPickTime: Button
+    private lateinit var tvDateSelected: TextView
+    private lateinit var tvTimeSelected: TextView
     private var title = ""
     private var description = ""
     private var drawableSelected = 0
@@ -41,12 +52,30 @@ TimePickerDialog.OnTimeSetListener, DatePickerDialog.OnDateSetListener {
 
     private lateinit var habitViewModel: HabitViewModel
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        _binding = FragmentCreateHabitItemBinding.bind(view)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        view = inflater.inflate(R.layout.fragment_create_habit_item, null)
+        return view
+    }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         habitViewModel = ViewModelProvider(this).get(HabitViewModel::class.java)
 
-        binding.btnConfirm.setOnClickListener {
+        btnConfirm = view.findViewById(R.id.btn_confirm)
+        etHabitTitle = view.findViewById(R.id.et_habitTitle)
+        etHabitDescription = view.findViewById(R.id.et_habitDescription)
+        ivFastFoodSelected = view.findViewById(R.id.iv_fastFoodSelected)
+        ivSmokeSelected = view.findViewById(R.id.iv_smokingSelected)
+        ivTeaSelected = view.findViewById(R.id.iv_teaSelected)
+        btnPickDate = view.findViewById(R.id.btn_pickDate)
+        btnPickTime = view.findViewById(R.id.btn_pickTime)
+        tvDateSelected = view.findViewById(R.id.tv_dateSelected)
+        tvTimeSelected = view.findViewById(R.id.tv_timeSelected)
+
+        btnConfirm.setOnClickListener {
             addHabitToDB()
         }
 
@@ -56,8 +85,8 @@ TimePickerDialog.OnTimeSetListener, DatePickerDialog.OnDateSetListener {
     }
 
     private fun addHabitToDB() {
-        title = binding.etHabitTitle.text.toString()
-        description = binding.etHabitDescription.text.toString()
+        title = etHabitTitle.text.toString()
+        description = etHabitDescription.text.toString()
 
         timeStamp = "$cleanDate $cleanTime"
 
@@ -74,38 +103,38 @@ TimePickerDialog.OnTimeSetListener, DatePickerDialog.OnDateSetListener {
     }
 
     private fun drawableSelected() {
-        binding.ivFastFoodSelected.setOnClickListener {
-            binding.ivFastFoodSelected.isSelected = !binding.ivFastFoodSelected.isSelected
+        ivFastFoodSelected.setOnClickListener {
+            ivFastFoodSelected.isSelected = !ivFastFoodSelected.isSelected
             drawableSelected = R.drawable.ic_fastfood_filled
 
-            binding.ivSmokingSelected.isSelected = false
-            binding.ivTeaSelected.isSelected = false
+            ivSmokeSelected.isSelected = false
+            ivTeaSelected.isSelected = false
         }
 
-        binding.ivSmokingSelected.setOnClickListener {
-            binding.ivSmokingSelected.isSelected = !binding.ivSmokingSelected.isSelected
+        ivSmokeSelected.setOnClickListener {
+            ivSmokeSelected.isSelected = !ivSmokeSelected.isSelected
             drawableSelected = R.drawable.ic_smoke_filled
 
-            binding.ivTeaSelected.isSelected = false
-            binding.ivFastFoodSelected.isSelected = false
+            ivTeaSelected.isSelected = false
+            ivFastFoodSelected.isSelected = false
         }
 
-        binding.ivTeaSelected.setOnClickListener {
-            binding.ivTeaSelected.isSelected = !binding.ivTeaSelected.isSelected
+        ivTeaSelected.setOnClickListener {
+            ivTeaSelected.isSelected = !ivTeaSelected.isSelected
             drawableSelected = R.drawable.ic_tea_filled
 
-            binding.ivSmokingSelected.isSelected = false
-            binding.ivFastFoodSelected.isSelected = false
+            ivSmokeSelected.isSelected = false
+            ivFastFoodSelected.isSelected = false
         }
     }
 
     private fun pickDateAndTime() {
-        binding.btnPickDate.setOnClickListener {
+        btnPickDate.setOnClickListener {
             getDateCalendar()
             DatePickerDialog(requireContext(), this, year, month, day).show()
         }
 
-        binding.btnPickTime.setOnClickListener {
+        btnPickTime.setOnClickListener {
             getTimeCalendar()
             TimePickerDialog(context, this, hour, minute, true).show()
         }
@@ -117,7 +146,7 @@ TimePickerDialog.OnTimeSetListener, DatePickerDialog.OnDateSetListener {
         minuteX: Int
     ) {
         cleanTime = Calculations.cleanTime(hourOfDay, minuteX)
-        binding.tvTimeSelected.text = "Time: $cleanTime"
+        tvTimeSelected.text = "Time: $cleanTime"
     }
 
     override fun onDateSet(
@@ -127,7 +156,7 @@ TimePickerDialog.OnTimeSetListener, DatePickerDialog.OnDateSetListener {
         dayX: Int
     ) {
         cleanDate = Calculations.cleanDate(dayX, monthX, yearX)
-        binding.tvDateSelected.text = "Date: $cleanDate"
+        tvDateSelected.text = "Date: $cleanDate"
     }
 
     private fun getTimeCalendar() {
